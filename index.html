@@ -15,7 +15,7 @@
             top: 0; left: 0; 
             width: 100%; height: 100%; 
             border: none; 
-            z-index: 1; /* Sits above the background, but below the help button */
+            z-index: 1; 
         }
 
         /* The 'Fix Connection' Button */
@@ -23,7 +23,7 @@
             position: absolute;
             bottom: 20px;
             right: 20px;
-            z-index: 100; /* Always on top */
+            z-index: 100; 
             text-align: center;
         }
 
@@ -44,7 +44,7 @@
         }
 
         .help-text {
-            display: none; /* Hidden by default */
+            display: none; 
             background: white;
             padding: 15px;
             border-radius: 8px;
@@ -62,9 +62,8 @@
 </head>
 <body>
 
-    <!-- 1. THE APP -->
-    <!-- REPLACE THE URL BELOW WITH YOUR /EXEC URL -->
-    <iframe src="PASTE_YOUR_WEB_APP_URL_HERE"></iframe>
+    <!-- 1. THE APP FRAME (I fixed the URL here) -->
+    <iframe src="https://script.google.com/a/macros/bisc.edu.eg/s/AKfycbyoY76N3IEHBdnUMA1BRpikYTDipdV44rcHxuzd8hBJs-ebqt8-5ImxQJZtppfr3p7w/exec"></iframe>
 
     <!-- 2. THE CONNECTION HELPER -->
     <div class="auth-container">
@@ -79,7 +78,6 @@
     </div>
 
     <script>
-        // Toggle the help instructions
         function toggleHelp() {
             var box = document.getElementById('help-box');
             if (box.style.display === 'block') {
@@ -89,7 +87,6 @@
             }
         }
 
-        // Service Worker for Installation
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js');
         }
