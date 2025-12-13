@@ -38,3 +38,61 @@
             font-size: 24px;
             cursor: pointer;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .help-text {
+            display: none; /* Hidden by default */
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            position: absolute;
+            bottom: 60px;
+            right: 0;
+            width: 250px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            font-size: 14px;
+            color: #333;
+        }
+
+        .show { display: block; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. THE APP -->
+    <!-- REPLACE THE URL BELOW WITH YOUR /EXEC URL -->
+    <iframe src="PASTE_YOUR_WEB_APP_URL_HERE"></iframe>
+
+    <!-- 2. THE CONNECTION HELPER -->
+    <div class="auth-container">
+        <div id="help-box" class="help-text">
+            <strong>White screen or Error?</strong><br><br>
+            Google prevents account switching inside apps.<br><br>
+            1. <a href="https://script.google.com/a/macros/bisc.edu.eg/s/AKfycbyoY76N3IEHBdnUMA1BRpikYTDipdV44rcHxuzd8hBJs-ebqt8-5ImxQJZtppfr3p7w/exec" target="_blank" style="color:#1a73e8; font-weight:bold;">Click here to Login</a><br>
+            (Select your School Account)<br><br>
+            2. Close that tab and restart this app.
+        </div>
+        <button class="auth-btn" onclick="toggleHelp()">?</button>
+    </div>
+
+    <script>
+        // Toggle the help instructions
+        function toggleHelp() {
+            var box = document.getElementById('help-box');
+            if (box.style.display === 'block') {
+                box.style.display = 'none';
+            } else {
+                box.style.display = 'block';
+            }
+        }
+
+        // Service Worker for Installation
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>
