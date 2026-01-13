@@ -4,20 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>BISC Side-Kick</title>
-  
-  <!-- PWA Settings -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#ffffff">
   <link rel="apple-touch-icon" href="icon.png">
-
-  <!-- ERROR TRAP: Prints errors to screen instead of white page -->
-  <script>
-    window.onerror = function(msg, url, line) {
-      document.body.innerHTML = '<div style="padding:20px; color:red; font-size:16px; font-family:sans-serif;"><h3>⚠️ App Error</h3><p>' + msg + '</p><p>Line: ' + line + '</p></div>';
-    };
-  </script>
-
-  <!-- Materialize CSS -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 
@@ -56,55 +45,59 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
   <script>
-    // =========================================================
-    // === 1. CONFIGURATION ===
-    // =========================================================
-    
-    const API_URL = "https://script.google.com/macros/s/AKfycbyMlIoIMhJVNgXzS1VvVlRMtlVEWOA9UNU8CEciZ7JWJNRan_yCG_7mIWiYu4wxxAfHBQ/exec";
+    // --- PASTE URL HERE ---
+    const API_URL = "PASTE_YOUR_PERSONAL_WEB_APP_URL_HERE";
 
-    // =========================================================
-    // === 2. THE API BRIDGE ===
-    // =========================================================
     const google = {
       script: {
         run: {
-          success: null, failure: null,
-          withSuccessHandler: function(cb) { this.success = cb; return this; },
-          withFailureHandler: function(cb) { this.failure = cb; return this; },
+          success:null, failure:null,
+          withSuccessHandler(cb) { this.success=cb; return this; },
+          withFailureHandler(cb) { this.failure=cb; return this; },
           
-          getHomepageData: function() { this._call('getHomepageData'); },
-          searchSheetLive: function(term) { this._call('search', {term: term}); },
-          getStudentDetailsForWebApp: function(row) { this._call('getStudentDetails', {row: row}); },
-          getStudentsForView: function(type, params) { 
-             this._call('getView', {viewType: type, yearGroup: params.yearGroup, form: params.form, peClass: params.peClass}); 
-          },
-          webSaveSportsAge: function(d) { /* Not supported in read-only API */ },
-          webSendFeedback: function(t) { /* Not supported in read-only API */ },
+          getHomepageData() { this._call('getHomepageData'); },
+          searchSheetLive(t) { this._call('search', {term:t}); },
+          getStudentDetailsForWebApp(r) { this._call('getStudentDetails', {row:r}); },
+          getStudentsForView(t, p) { this._call('getView', {viewType:t, yearGroup:p.yearGroup, form:p.form, peClass:p.peClass}); },
+          webGenerateExport(t, p, f) { this._call('export', {type:t, format:f, yearGroup:p.yearGroup, form:p.form, peClass:p.peClass}); },
+          webSendFeedback(t) { this._call('feedback', {text:t}); },
 
-          _call: function(action, params = {}) {
-            const self = this;
+          _call(a, p={}) {
+            const self=this;
             const url = new URL(API_URL);
-            url.searchParams.append('action', action);
-            for (const key in params) { if (params[key]) url.searchParams.append(key, params[key]); }
-
-            fetch(url)
-              .then(response => response.json())
-              .then(data => {
-                if (data.error && self.failure) self.failure(new Error(data.error));
-                else if (self.success) self.success(data);
-              })
-              .catch(err => { if (self.failure) self.failure(err); });
+            url.searchParams.append('action', a);
+            for(let k in p) if(p[k]) url.searchParams.append(k, p[k]);
+            
+            fetch(url).then(r=>r.json()).then(d=>{
+              if(d.error) self.failure && self.failure(new Error(d.error));
+              else self.success && self.success(d);
+            }).catch(e=>self.failure && self.failure(e));
           }
         }
       }
     };
 
-    // =========================================================
-    // === 3. APP LOGIC (UI) ===
-    // =========================================================
-    
+    // --- CLIENT STATE ---
     const app = document.getElementById('app-container');
-    window.appState = { classHierarchy: {}, currentList: [], currentIndex: -1, isPeTeacher: true };
+    const STORAGE_KEY = 'BISC_DATA_V1';
+    
+    // Load from LocalStorage
+    const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{"starred":[], "recents":[]}');
+    window.appState = { 
+      hierarchy: {}, 
+      peClasses: [],
+      currentList: [], 
+      currentIndex: -1, 
+      starred: savedData.starred,
+      recents: savedData.recents
+    };
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        starred: window.appState.starred,
+        recents: window.appState.recents
+      }));
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
       showLoader();
@@ -112,14 +105,16 @@
     });
 
     function initApp(data) {
-      if (data.error) return showError({ message: data.error });
-      window.appState.classHierarchy = data.classHierarchy || {};
-      window.appState.peClasses = data.peClasses || [];
-      renderHomepage(data);
+      window.appState.hierarchy = data.classHierarchy;
+      window.appState.peClasses = data.peClasses;
+      renderHomepage();
     }
 
-    function renderHomepage(data) {
-      const peSection = `<div class="input-field"><select id="pe-selector">${createOptions(data.peClasses, 'PE Class')}</select></div>`;
+    // --- RENDERERS ---
+
+    function renderHomepage() {
+      const peOpts = createOptions(window.appState.peClasses, 'PE Class');
+      const yearOpts = createOptions(window.appState.yearGroups || Object.keys(window.appState.hierarchy).map(k=>({name:k})), 'Year Group');
       
       const html = `
         <div class="card-panel">
@@ -127,28 +122,43 @@
           <div class="section">
             <div class="section-header"><i class="material-icons">search</i>Student Search</div>
             <div class="input-field" style="margin-top:0;">
-              <input id="search-term" type="text" placeholder="Enter name or ID" onchange="handleSearch()">
+              <input id="search-term" type="text" placeholder="Name, ID, Email, Parent..." onchange="handleSearch()">
             </div>
           </div>
           <div class="section">
             <div class="section-header"><i class="material-icons">photo_camera</i>Class Photo Viewer</div>
-            <div class="input-field"><select id="year-group-selector" onchange="handleYearGroupChange(this.value)">${createOptions(data.yearGroups, 'Year Group')}</select></div>
+            <div class="input-field"><select id="year-group-selector" onchange="handleYearGroupChange(this.value)">${yearOpts}</select></div>
             <div class="input-field"><select id="class-selector" disabled><option value="" disabled selected>Class</option></select></div>
-            ${peSection}
+            <div class="input-field"><select id="pe-selector">${peOpts}</select></div>
             <div class="btn-group">
               <button id="btn-year" class="btn-small" onclick="handleView('year')">Year</button>
               <button id="btn-class" class="btn-small" onclick="handleView('class')">Class</button>
               <button id="btn-pe" class="btn-small" onclick="handleView('pe')">PE</button>
             </div>
           </div>
+          <ul class="collapsible">
+            <li>
+              <div class="collapsible-header"><i class="material-icons">history</i>Recent (${window.appState.recents.length})</div>
+              <div class="collapsible-body" style="padding:16px;">${createStudentList(window.appState.recents, 'No recents.')}</div>
+            </li>
+            <li>
+              <div class="collapsible-header"><i class="material-icons">star</i>Starred (${window.appState.starred.length})</div>
+              <div class="collapsible-body" style="padding:16px;">${createStudentList(window.appState.starred, 'No starred students.')}</div>
+            </li>
+          </ul>
+          <div class="section footer-buttons">
+             <button class="btn-flat" onclick="renderHelp()">Help</button>
+             <button class="btn-flat" onclick="renderFeedback()">Feedback</button>
+          </div>
         </div>`;
       app.innerHTML = html;
       M.FormSelect.init(document.querySelectorAll('select'));
+      M.Collapsible.init(document.querySelectorAll('.collapsible'));
     }
 
     function renderSearchResults(results) {
       window.appState.currentList = results.map(s => s.row);
-      const html = `
+      app.innerHTML = `
         <div class="card-panel">
           ${createNavBar()}
           <div class="section">
@@ -156,22 +166,32 @@
             ${createStudentList(results, 'No results found.')}
           </div>
         </div>`;
-      app.innerHTML = html;
     }
 
     function renderStudentDetails(s) {
+      // Add to Recents
+      addToRecents(s);
+      
+      window.appState.currentStudent = s;
       window.appState.currentIndex = window.appState.currentList.indexOf(parseInt(s.row));
       
-      const html = `
+      const isStarred = window.appState.starred.some(st => st.row == s.row);
+      const starIcon = isStarred ? 'star' : 'star_border'; 
+      const classLink = `<span style="color:#1a73e8;text-decoration:underline" onclick="handleView('class', '${s.yearGroup}', '${s.form}')">${s.yearGroup} / ${s.form}</span>`;
+
+      app.innerHTML = `
         <div class="card-panel">
           ${createNavBar(true)}
-          <h5 class="center-align" style="padding:16px 0;">${s.name}</h5>
+          <h5 class="center-align" style="padding:16px 0;">
+            ${s.name}
+            <i class="material-icons right" style="cursor:pointer; color:#f9ab00;" onclick="toggleStar()">${starIcon}</i>
+          </h5>
           <img src="${s.photoUrl}" class="student-photo">
           <div class="section">
             <div class="section-header">Details</div>
             ${item('Admission', s.admissionNumber)}
             ${item('DOB', s.dob)}
-            ${item('Form', `${s.yearGroup} / ${s.form}`)}
+            ${item('Form', classLink)}
           </div>
           <div class="section">
             <div class="section-header">Contact</div>
@@ -189,61 +209,64 @@
             ${item('Allergy', s.allergy)}
           </div>
         </div>`;
-      app.innerHTML = html;
     }
 
-    function renderPhotoViewer(data) {
+    function renderPhotoViewer(data, type) {
       window.appState.currentList = data.students.map(s => s.row);
       let grid = '';
       data.students.forEach(s => {
         grid += `<div class="photo-grid-item" onclick="handleSelectStudent('${s.row}')"><img src="${s.photoUrl}"><div class="name">${s.name}</div></div>`;
       });
       
-      const html = `
+      const p1 = type==='pe' ? 'pe' : 'class';
+      const p2 = type==='pe' ? data.title.replace('PE Class: ','') : data.yearGroup;
+      const p3 = type==='pe' ? '' : data.form;
+
+      app.innerHTML = `
         <div class="card-panel">
           ${createNavBar()}
           <div class="section">
             <h6>${data.title} (${data.students.length})</h6>
             <div class="photo-grid">${grid}</div>
+            <div class="center-align" style="margin-top:20px">
+                <button class="btn-small white black-text" onclick="handleExport('pdf','${p1}','${p2}','${p3}')">PDF</button>
+                <button class="btn-small white black-text" onclick="handleExport('doc','${p1}','${p2}','${p3}')">Doc</button>
+            </div>
           </div>
         </div>`;
-      app.innerHTML = html;
     }
 
-    // --- UTILS ---
-    function createNavBar(details=false) {
-      return `<div class="nav-bar section">
-        <a onclick="handleHome()"><i class="material-icons">home</i></a>
-        ${details ? `<a onclick="handleNav(-1)"><i class="material-icons">arrow_back</i></a><a onclick="handleNav(1)"><i class="material-icons">arrow_forward</i></a>` : ''}
-      </div>`;
+    function renderExportSuccess(url, name) {
+        app.innerHTML = `<div class="card-panel center-align" style="padding:40px">
+            <i class="material-icons green-text" style="font-size:60px">check_circle</i>
+            <h5>Export Ready!</h5>
+            <p>${name}</p>
+            <a href="${url}" target="_blank" class="btn blue">Open File</a>
+            <br><br>
+            <button class="btn-flat" onclick="renderHomepage()">Back Home</button>
+        </div>`;
+    }
+
+    function renderFeedback() {
+        app.innerHTML = `<div class="card-panel">
+            ${createNavBar()}
+            <h5>Feedback</h5>
+            <textarea id="fb-text" class="materialize-textarea" placeholder="Message..."></textarea>
+            <button class="btn blue" onclick="submitFeedback()">Send</button>
+        </div>`;
     }
     
-    function createStudentList(list, msg) {
-      if(!list.length) return `<p>${msg}</p>`;
-      return list.map(s => `<div class="student-list-item" onclick="handleSelectStudent('${s.row}')"><img src="${s.photoUrl}"><div class="info"><span class="name">${s.name}</span><span class="email">${s.email||''}</span></div></div>`).join('');
+    function renderHelp() {
+        app.innerHTML = `<div class="card-panel">
+            ${createNavBar()}
+            <h5>Help</h5>
+            <p><b>Search:</b> Name, ID, Parent Email/Phone.</p>
+            <p><b>Star:</b> Save students to favorites locally.</p>
+            <p><b>Export:</b> Create PDF/Doc from Class View.</p>
+        </div>`;
     }
-
-    function createOptions(list, ph) {
-      let opts = `<option value="" disabled selected>${ph}</option>`;
-      list.forEach(i => opts += `<option value="${i.name}">${i.name} ${i.count?'('+i.count+')':''}</option>`);
-      return opts;
-    }
-
-    function item(lbl, val) { 
-        if(!val || val === 'N/A') return '';
-        return `<div class="detail-item"><span class="label">${lbl}</span><span class="value">${val}</span></div>`; 
-    }
-    
-    function emailItem(lbl, email) {
-        if(!email || email === 'N/A') return '';
-        return `<div class="detail-item"><span class="label">${lbl}</span><a href="mailto:${email}" class="email-link">${email} <i class="material-icons tiny">email</i></a></div>`;
-    }
-
-    function showLoader() { app.innerHTML = '<div style="display:flex;justify-content:center;padding:50px;"><div class="preloader-wrapper active"><div class="spinner-layer spinner-blue-only"><div class="circle-clipper left"><div class="circle"></div></div></div></div></div>'; }
-    function showError(e) { app.innerHTML = `<div class="card-panel red white-text"><b>Error:</b> ${e.message}</div>`; }
 
     // --- ACTIONS ---
-    function handleHome() { showLoader(); google.script.run.withSuccessHandler(initApp).getHomepageData(); }
     
     function handleSearch() {
       const t = document.getElementById('search-term').value;
@@ -254,13 +277,8 @@
       showLoader(); google.script.run.withSuccessHandler(renderStudentDetails).getStudentDetailsForWebApp(row);
     }
 
-    function handleNav(dir) {
-      const idx = window.appState.currentIndex + dir;
-      if(idx >= 0 && idx < window.appState.currentList.length) handleSelectStudent(window.appState.currentList[idx]);
-    }
-
     function handleYearGroupChange(yg) {
-      const data = window.appState.classHierarchy[yg];
+      const data = window.appState.hierarchy[yg];
       const sel = document.getElementById('class-selector');
       if(data) {
         sel.innerHTML = createOptions(data.classes.map(c=>({name:c})), 'Class');
@@ -269,24 +287,67 @@
       M.FormSelect.init(sel);
     }
 
-    function handleView(type) {
-      const yg = document.getElementById('year-group-selector').value;
-      const fm = document.getElementById('class-selector').value;
-      const pe = document.getElementById('pe-selector') ? document.getElementById('pe-selector').value : null;
+    function handleView(type, p2, p3) {
+      let params = {};
+      if(type==='class') { params.yearGroup = p2 || document.getElementById('year-group-selector').value; params.form = p3 || document.getElementById('class-selector').value; }
+      else if(type==='year') { params.yearGroup = document.getElementById('year-group-selector').value; }
+      else if(type==='pe') { params.peClass = document.getElementById('pe-selector').value; }
       
-      const params = { yearGroup: yg, form: fm, peClass: pe };
-      if(type === 'year' && !yg) return;
-      if(type === 'class' && (!yg || !fm)) return;
-      if(type === 'pe' && !pe) return;
-
+      if(type==='class' && (!params.yearGroup || !params.form)) return;
+      
       showLoader();
-      google.script.run.withSuccessHandler(renderPhotoViewer).getStudentsForView(type, params);
+      google.script.run.withSuccessHandler((d)=>renderPhotoViewer(d,type)).getStudentsForView(type, params);
     }
 
-    // PWA Install Logic
-    if('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
+    function handleExport(fmt, type, p2, p3) {
+        M.toast({html: 'Creating file (10s)...'});
+        const params = { yearGroup: p2, form: p3, peClass: p2 }; // p2 is peClass for PE type
+        google.script.run.withSuccessHandler((r) => {
+            if(r.error) M.toast({html: 'Error: '+r.error});
+            else renderExportSuccess(r.url, r.name);
+        }).webGenerateExport(type, params, fmt);
     }
+
+    function submitFeedback() {
+        const t = document.getElementById('fb-text').value;
+        if(t) google.script.run.withSuccessHandler(()=>M.toast({html:'Sent!'})).webSendFeedback(t);
+    }
+
+    // --- STATE LOGIC ---
+    function toggleStar() {
+        const s = window.appState.currentStudent;
+        const idx = window.appState.starred.findIndex(st => st.row == s.row);
+        if(idx > -1) window.appState.starred.splice(idx, 1);
+        else window.appState.starred.push({ name:s.name, row:s.row, photoUrl:s.photoUrl, email:s.email });
+        
+        saveState();
+        renderStudentDetails(s); // Re-render to toggle icon
+        M.toast({html: idx > -1 ? 'Unstarred' : 'Starred'});
+    }
+
+    function addToRecents(s) {
+        const recents = window.appState.recents;
+        const exists = recents.findIndex(r => r.row == s.row);
+        if(exists > -1) recents.splice(exists, 1);
+        recents.unshift({ name:s.name, row:s.row, photoUrl:s.photoUrl, email:s.email });
+        if(recents.length > 10) recents.pop();
+        saveState();
+    }
+
+    // --- HELPER UTILS ---
+    function showLoader() { app.innerHTML = '<div style="display:flex;justify-content:center;padding:50px;"><div class="preloader-wrapper active"><div class="spinner-layer spinner-blue-only"><div class="circle-clipper left"><div class="circle"></div></div></div></div></div>'; }
+    function showError(e) { app.innerHTML = `<div class="card-panel red white-text"><b>Error:</b> ${e.message}</div>`; }
+    function createNavBar(det) { return `<div class="nav-bar section"><a onclick="renderHomepage()"><i class="material-icons">home</i></a>${det ? `<a onclick="handleNav(-1)"><i class="material-icons">arrow_back</i></a><a onclick="handleNav(1)"><i class="material-icons">arrow_forward</i></a>`:''}</div>`; }
+    function createStudentList(l,m) { return l.length ? l.map(s=>`<div class="student-list-item" onclick="handleSelectStudent('${s.row}')"><img src="${s.photoUrl}"><div class="info"><span class="name">${s.name}</span><span class="email">${s.email}</span></div></div>`).join('') : `<p>${m}</p>`; }
+    function createOptions(l,p) { return `<option value="" disabled selected>${p}</option>` + l.map(i=>`<option value="${i.name}">${i.name} ${i.count?'('+i.count+')':''}</option>`).join(''); }
+    function item(l,v) { return v && v!=='N/A' ? `<div class="detail-item"><span class="label">${l}</span><span class="value">${v}</span></div>` : ''; }
+    function emailItem(l,e) { return e && e!=='N/A' ? `<div class="detail-item"><span class="label">${l}</span><a href="https://mail.google.com/mail/?view=cm&fs=1&to=${e}" target="_blank" class="email-link">${e} <i class="material-icons tiny">email</i></a></div>` : ''; }
+    function handleNav(d) {
+        const i = window.appState.currentIndex + d;
+        if(i>=0 && i<window.appState.currentList.length) handleSelectStudent(window.appState.currentList[i]);
+    }
+
+    if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
   </script>
 </body>
 </html>
