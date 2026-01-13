@@ -51,13 +51,13 @@
 
   <script>
     // =========================================================
-    // === 1. CONFIGURATION (PASTE YOUR URL BELOW) ===
+    // === 1. CONFIGURATION ===
     // =========================================================
     
     const API_URL = "https://script.google.com/macros/s/AKfycbyMlIoIMhJVNgXzS1VvVlRMtlVEWOA9UNU8CEciZ7JWJNRan_yCG_7mIWiYu4wxxAfHBQ/exec";
 
     // =========================================================
-    // === 2. THE API BRIDGE (Replaces google.script.run) ===
+    // === 2. THE API BRIDGE ===
     // =========================================================
     const google = {
       script: {
@@ -266,4 +266,22 @@
     function handleView(type) {
       const yg = document.getElementById('year-group-selector').value;
       const fm = document.getElementById('class-selector').value;
-      const pe = document.getElementById('pe-selector') ? document.getElementById('pe-selector').value :
+      // Fixed the ternary operator syntax here
+      const pe = document.getElementById('pe-selector') ? document.getElementById('pe-selector').value : null;
+      
+      const params = { yearGroup: yg, form: fm, peClass: pe };
+      if(type === 'year' && !yg) return;
+      if(type === 'class' && (!yg || !fm)) return;
+      if(type === 'pe' && !pe) return;
+
+      showLoader();
+      google.script.run.withSuccessHandler(renderPhotoViewer).getStudentsForView(type, params);
+    }
+
+    // PWA Install Logic
+    if('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
