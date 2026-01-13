@@ -1,261 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <!-- STEALTH MODE: Fixes "Failed to Fetch" errors from Google -->
-  <meta name="referrer" content="no-referrer">
-  
-  <title>BISC Side-Kick</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon.png">
-  <meta name="theme-color" content="#ffffff">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-  <style>
-    /* APP LAYOUT */
-    body { background-color: #f0f2f5; font-family: 'Roboto', sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; }
-    #app-container { width: 100%; max-width: 450px; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-
-    /* NAVBAR */
-    .nav-bar { display: flex; justify-content: space-around; align-items: center; background: #fff; padding: 8px 0; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
-    .nav-icon { padding: 10px; cursor: pointer; color: #5f6368; border-radius: 50%; }
-    .nav-icon:active { background: #e8f0fe; color: #1a73e8; }
-    .nav-icon.disabled { color: #e0e0e0; pointer-events: none; }
-
-    /* CARDS */
-    .card { margin: 10px; border: 1px solid #dadce0; border-radius: 8px; overflow: hidden; background: #fff; }
-    .section { padding: 16px; border-bottom: 1px solid #f1f3f4; }
-    .section-header { font-size: 13px; font-weight: 500; text-transform: uppercase; color: #5f6368; margin-bottom: 12px; display: flex; align-items: center; }
-    .section-header i { margin-right: 8px; font-size: 18px; }
-
-    /* INPUTS */
-    input, select { width: 100%; padding: 12px 0; border: none; border-bottom: 1px solid #dadce0; font-size: 16px; outline: none; background: transparent; margin-bottom: 8px; }
-    input:focus, select:focus { border-bottom: 2px solid #1a73e8; }
-    .btn-row { display: flex; gap: 8px; margin-top: 12px; }
-    .btn { flex: 1; padding: 10px; text-align: center; border-radius: 4px; border: 1px solid #dadce0; background: white; color: #3c4043; font-weight: 500; font-size: 14px; cursor: pointer; }
-    .btn:active { background: #f1f3f4; }
-
-    /* LISTS & DETAILS */
-    .list-item { display: flex; align-items: center; padding: 12px 16px; border-top: 1px solid #f1f3f4; cursor: pointer; }
-    .list-item img { width: 40px; height: 40px; border-radius: 4px; margin-right: 16px; object-fit: cover; background: #eee; }
-    .list-item .title { font-weight: 500; color: #202124; font-size: 15px; }
-    .list-item .sub { font-size: 13px; color: #5f6368; }
-    
-    .student-photo { width: 100%; max-width: 240px; aspect-ratio: 3/4; border-radius: 8px; margin: 0 auto; display: block; object-fit: cover; background: #eee; }
-    .detail-row { margin-bottom: 16px; }
-    .label { font-size: 11px; color: #5f6368; display: block; margin-bottom: 4px; font-weight: 500; text-transform: uppercase; }
-    .val { font-size: 16px; color: #202124; }
-    .link { color: #1a73e8; text-decoration: none; cursor: pointer; }
-
-    /* GRID */
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .grid-item { cursor: pointer; text-align: center; }
-    .grid-item img { width: 100%; aspect-ratio: 3/4; border-radius: 4px; object-fit: cover; background: #eee; }
-    .grid-item div { font-size: 11px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    .loader { padding: 50px; text-align: center; color: #1a73e8; }
-    .collapsible { border-top: 1px solid #f1f3f4; }
-    .coll-head { padding: 14px 16px; font-weight: 500; cursor: pointer; display: flex; align-items: center; color: #3c4043; }
-    .coll-head i { margin-right: 12px; color: #5f6368; }
-    .coll-body { display: none; }
-    .coll-body.open { display: block; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BISC Side-Kick</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="theme-color" content="#ffffff">
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #f5f5f5; font-family: sans-serif; }
+        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; z-index: 1; }
+        .auth-container { position: absolute; bottom: 20px; right: 20px; z-index: 100; text-align: center; }
+        .auth-btn { background-color: #1a73e8; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); font-size: 24px; cursor: pointer; }
+        .help-text { display: none; background: white; padding: 15px; border-radius: 8px; position: absolute; bottom: 60px; right: 0; width: 250px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 14px; color: #333; }
+    </style>
 </head>
 <body>
 
-<div id="app-container"></div>
+    <!-- PASTE YOUR NEW EXEC URL HERE -->
+    <iframe src="https://script.google.com/macros/s/AKfycbyoY76N3IEHBdnUMA1BRpikYTDipdV44rcHxuzd8hBJs-ebqt8-5ImxQJZtppfr3p7w/exec"></iframe>
 
-<script>
-// ======================================================
-// === PASTE YOUR WORKING URL HERE ======================
-// ======================================================
-const API_URL = "https://script.google.com/macros/s/AKfycbydEfDnhHA8n-IMcdpiU4vYqwPxDwU_8Nq3Fqbw3N7jVsgztGykYkJb7fxW2PL3J-hPHw/exec";
+    <div class="auth-container">
+        <div id="help-box" class="help-text">
+            <strong>Welcome to Side-Kick</strong><br><br>
+            If the screen is white:<br>
+            1. <a href="https://script.google.com/macros/s/AKfycbyoY76N3IEHBdnUMA1BRpikYTDipdV44rcHxuzd8hBJs-ebqt8-5ImxQJZtppfr3p7w/exec" target="_blank" style="color:#1a73e8; font-weight:bold;">Login / Connect</a><br>
+            2. Refresh this app.
+        </div>
+        <button class="auth-btn" onclick="document.getElementById('help-box').style.display = document.getElementById('help-box').style.display === 'block' ? 'none' : 'block'">?</button>
+    </div>
 
-window.appState = { 
-    hierarchy: {}, peClasses: [], 
-    currentList: [], currentIndex: -1, currentStudent: null,
-    recents: JSON.parse(localStorage.getItem('recents')||'[]'),
-    starred: JSON.parse(localStorage.getItem('starred')||'[]')
-};
-
-const google = { script: { run: {
-    withSuccessHandler(s) { this.s=s; return this; }, withFailureHandler(f) { this.f=f; return this; },
-    getHomepageData() { call('getHomepageData'); },
-    searchSheetLive(t) { call('search', {term:t}); },
-    getStudentDetailsForWebApp(r) { call('getStudentDetails', {row:r}); },
-    getStudentsForView(t,p) { call('getView', {viewType:t, ...p}); },
-    webSendFeedback(t) { call('feedback', {text:t}); }
-}}};
-
-function call(a, p={}) {
-    const u = new URL(API_URL); u.searchParams.append('action', a);
-    for(let k in p) if(p[k]) u.searchParams.append(k, p[k]);
-    fetch(u).then(r=>r.json()).then(d=>{
-        if(d.error) alert("Server Error: "+d.error); else window.google.script.run.s(d);
-    }).catch(e=>alert("Failed to connect. Check internet or refresh."));
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    showLoader();
-    google.script.run.withSuccessHandler(init).getHomepageData();
-});
-
-function init(data) {
-    window.appState.hierarchy = data.classHierarchy;
-    window.appState.peClasses = data.peClasses;
-    renderHome();
-}
-
-function renderHome() {
-    const s = window.appState;
-    const yOpts = `<option value="" disabled selected>Year Group</option>` + Object.keys(s.hierarchy).map(k=>`<option value="${k}">${k}</option>`).join('');
-    const pOpts = `<option value="" disabled selected>PE Class</option>` + s.peClasses.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
-
-    document.getElementById('app-container').innerHTML = `
-        <div class="card">
-            ${createNavBar('home')}
-            <div class="section">
-                <div class="section-header"><i class="material-icons">search</i>Student Search</div>
-                <input id="search" type="text" placeholder="Name, ID, Email, Parent..." onchange="handleSearch()">
-            </div>
-            <div class="section">
-                <div class="section-header"><i class="material-icons">photo_camera</i>Class Photo Viewer</div>
-                <select id="year" onchange="loadClasses()">${yOpts}</select>
-                <select id="class" disabled><option>Class</option></select>
-                <select id="pe">${pOpts}</select>
-                <div class="btn-row">
-                    <div class="btn" onclick="handleView('year')">Year</div>
-                    <div class="btn" onclick="handleView('class')">Class</div>
-                    <div class="btn" onclick="handleView('pe')">PE</div>
-                </div>
-            </div>
-            <div class="collapsible">
-                <div class="coll-head" onclick="toggleColl(this)"><i class="material-icons">history</i>Recent Searches (${s.recents.length})</div>
-                <div class="coll-body" style="padding:0 16px">${createList(s.recents,'No recents.')}</div>
-            </div>
-            <div class="collapsible">
-                <div class="coll-head" onclick="toggleColl(this)"><i class="material-icons">star</i>Starred Students (${s.starred.length})</div>
-                <div class="coll-body" style="padding:0 16px">${createList(s.starred,'No starred.')}</div>
-            </div>
-            <div style="text-align:center; padding:20px;">
-                <span class="link" onclick="renderHelp()" style="margin:0 10px">Help</span>
-                <span class="link" onclick="renderFeedback()" style="margin:0 10px">Feedback</span>
-            </div>
-        </div>`;
-    M.Collapsible.init(document.querySelectorAll('.collapsible'));
-}
-
-function renderDetails(s) {
-    window.appState.currentStudent = s;
-    window.appState.currentIndex = window.appState.currentList.indexOf(parseInt(s.row));
-    addToRecents(s);
-    const starIcon = window.appState.starred.some(x=>x.row==s.row) ? 'star' : 'star_border';
-
-    document.getElementById('app-container').innerHTML = `
-        <div class="card">
-            ${createNavBar('details')}
-            <div style="text-align:center; padding:20px 0;">
-                <h2 style="font-size:22px; font-weight:400; margin:0 0 10px 0;">${s.name}</h2>
-                <i class="material-icons" style="color:#f9ab00;cursor:pointer;font-size:28px" onclick="toggleStar()">${starIcon}</i>
-            </div>
-            <img src="${s.photoUrl}" class="student-photo">
-            
-            <div class="section">
-                <div class="section-header">👤 Student Details</div>
-                ${item('Admission', s.admissionNumber)}
-                ${item('Date of Birth', s.dob)}
-                ${item('Current Age', s.currentAge)}
-                ${item('Sports Age', s.sportsAge)}
-                <div class="detail-row">
-                    <span class="label">Year / Form</span>
-                    <span class="val link" onclick="handleView('class', '${s.yearGroup}', '${s.form}')">${s.yearGroup} / ${s.form}</span>
-                </div>
-            </div>
-            <div class="section">
-                <div class="section-header">📞 Contact Info</div>
-                ${emailItem('Student Email', s.email)}
-                ${item("Father's Mobile", s.fatherMobile)}
-                ${emailItem("Father's Email", s.fatherEmail)}
-                ${item("Mother's Mobile", s.motherMobile)}
-                ${emailItem("Mother's Email", s.motherEmail)}
-                ${item("Parents Greeting", "Coming soon")}
-            </div>
-            <div class="section">
-                <div class="section-header">⚕️ Medical</div>
-                ${item('Medical Info', s.medicalComments)}
-                ${item('Ailment', s.ailment)}
-                ${item('Allergy', s.allergy)}
-            </div>
-        </div>`;
-}
-
-function renderViewer(data) {
-    window.appState.currentList = data.students.map(s => s.row);
-    const grid = data.students.map(s => `<div class="grid-item" onclick="fetchStudent('${s.row}')"><img src="${s.photoUrl}" loading="lazy"><div>${s.name}</div></div>`).join('');
-    document.getElementById('app-container').innerHTML = `
-        <div class="card">
-            ${createNavBar()}
-            <div class="section">
-                <div class="section-header">${data.title} (${data.students.length})</div>
-                <div class="grid">${grid}</div>
-            </div>
-        </div>`;
-}
-
-function createNavBar(ctx) {
-    const d = ctx === 'details';
-    return `<div class="nav-bar">
-        <i class="material-icons nav-icon" onclick="renderHome()">home</i>
-        <i class="material-icons nav-icon" onclick="focusSearch()">search</i>
-        <i class="material-icons nav-icon ${!d?'disabled':''}" onclick="nav(-1)">arrow_back</i>
-        <i class="material-icons nav-icon ${!d?'disabled':''}" onclick="nav(1)">arrow_forward</i>
-        <i class="material-icons nav-icon" onclick="viewStarred()">star</i>
-    </div>`;
-}
-
-function createList(l,m) {
-    if(!l.length) return `<div style="padding:10px; color:#999;">${m}</div>`;
-    return l.map(s => `<div class="list-item" onclick="fetchStudent('${s.row}')"><img src="${s.photoUrl}"><div class="text"><span class="title">${s.name}</span><span class="sub">${s.email||''}</span></div></div>`).join('');
-}
-
-function item(l, v) { return (!v||v=='N/A') ? '' : `<div class="detail-row"><span class="label">${l}</span><span class="val">${v}</span></div>`; }
-function emailItem(l, v) { return (!v||v=='N/A') ? '' : `<div class="detail-row"><span class="label">${l}</span><a href="https://mail.google.com/mail/?view=cm&fs=1&to=${v}" target="_blank" class="link">${v}</a></div>`; }
-function showLoader() { document.getElementById('app-container').innerHTML = '<div class="loader"><div class="preloader-wrapper active"><div class="spinner-layer spinner-blue-only"><div class="circle-clipper left"><div class="circle"></div></div></div></div></div>'; }
-function renderHelp() { document.getElementById('app-container').innerHTML = `<div class="card">${createNavBar()}<div class="section"><div class="section-header">Help</div><p>Use search, filters, or starred.</p><div class="btn" onclick="renderHome()">Back</div></div></div>`; }
-function renderFeedback() { document.getElementById('app-container').innerHTML = `<div class="card">${createNavBar()}<div class="section"><div class="section-header">Feedback</div><input id="fb" placeholder="Message"><div class="btn primary" onclick="subFB()">Send</div></div></div>`; }
-
-function handleSearch() { const t=document.getElementById('search').value; if(t) { showLoader(); google.script.run.withSuccessHandler(renderSearchResults).searchSheetLive(t); }}
-function fetchStudent(r) { showLoader(); google.script.run.withSuccessHandler(renderDetails).getStudentDetailsForWebApp(r); }
-function handleView(t,y,f) {
-    const p = {yearGroup: y||document.getElementById('year').value, form: f||document.getElementById('class').value, peClass: document.getElementById('pe').value};
-    if((t=='class'&&(!p.yearGroup||!p.form)) || (t=='year'&&!p.yearGroup) || (t=='pe'&&!p.peClass)) return;
-    showLoader(); google.script.run.withSuccessHandler(d=>renderViewer(d)).getStudentsForView(t,p);
-}
-function loadClasses() {
-    const y = document.getElementById('year').value;
-    const s = document.getElementById('class');
-    s.innerHTML = `<option disabled selected>Class</option>` + window.appState.hierarchy[y].classes.map(c=>`<option value="${c}">${c}</option>`).join('');
-    s.disabled = false;
-}
-function nav(d) { const i=window.appState.currentIndex+d; if(i>=0 && i<window.appState.currentList.length) fetchStudent(window.appState.currentList[i]); }
-function toggleStar() {
-    const s=window.appState.currentStudent; const i=window.appState.starred.findIndex(x=>x.row==s.row);
-    if(i>-1) window.appState.starred.splice(i,1); else window.appState.starred.push({name:s.name,row:s.row,photoUrl:s.photoUrl,email:s.email});
-    localStorage.setItem('starred', JSON.stringify(window.appState.starred)); renderDetails(s);
-}
-function addToRecents(s) {
-    const r=window.appState.recents; const i=r.findIndex(x=>x.row==s.row);
-    if(i>-1) r.splice(i,1); r.unshift({name:s.name,row:s.row,photoUrl:s.photoUrl,email:s.email});
-    if(r.length>5) r.pop(); localStorage.setItem('recents', JSON.stringify(r));
-}
-function viewStarred() { document.getElementById('app-container').innerHTML=`<div class="card">${createNavBar()}<div class="section"><div class="section-header">Starred</div>${createList(window.appState.starred,'None')}</div></div>`; }
-function renderSearchResults(l) { document.getElementById('app-container').innerHTML=`<div class="card">${createNavBar()}<div class="section"><div class="section-header">Results</div>${createList(l,'None')}</div></div>`; window.appState.currentList=l.map(s=>s.row); }
-function subFB() { const t=document.getElementById('fb').value; if(t) google.script.run.withSuccessHandler(()=>alert('Sent!')).webSendFeedback(t); }
-function toggleColl(el) { el.nextElementSibling.classList.toggle('open'); }
-function focusSearch() { renderHome(); setTimeout(()=>document.getElementById('search').focus(),100); }
-
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-</script>
+    <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
 </body>
 </html>
