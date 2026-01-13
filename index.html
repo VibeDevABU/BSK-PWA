@@ -5,430 +5,341 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>BISC Side-Kick</title>
   <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffffff">
   <link rel="apple-touch-icon" href="icon.png">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
   <style>
-    /* GOOGLE CARD STYLE */
-    body { background-color: #f5f5f5; color: #3c4043; font-family: 'Roboto', sans-serif; margin: 0; padding-bottom: 20px; }
-    .container { max-width: 480px; margin: 10px auto; padding: 0 8px; }
-    
-    .card {
-      background: white; border: 1px solid #dadce0; border-radius: 8px;
-      overflow: hidden; margin-bottom: 10px;
-    }
-    
+    body { background-color: #f5f5f5; color: #3c4043; font-family: 'Roboto', sans-serif; padding-bottom: 30px; }
+    .container { max-width: 450px; margin-top: 10px; }
+    .card-panel { padding: 0; border: 1px solid #dadce0; border-radius: 8px; background-color: #fff; margin-bottom: 10px; }
     .section { border-bottom: 1px solid #e0e0e0; padding: 16px; }
     .section:last-child { border-bottom: none; }
     
-    .section-header { 
-      font-size: 14px; font-weight: 500; color: #3c4043; 
-      display: flex; align-items: center; margin-bottom: 12px; 
-    }
-    .section-header i { margin-right: 12px; color: #5f6368; font-size: 18px; }
-
-    /* UNIVERSAL NAV BAR */
-    .nav-bar { 
-      display: flex; justify-content: space-around; align-items: center; 
-      background: white; padding: 8px 0; border-bottom: 1px solid #e0e0e0;
-    }
-    .nav-btn { 
-      background: none; border: none; cursor: pointer; padding: 8px; 
-      color: #5f6368; display: flex; flex-direction: column; align-items: center;
-    }
-    .nav-btn i { font-size: 24px; }
-    .nav-btn:active { color: #1a73e8; }
-
-    /* FORM ELEMENTS */
-    input[type=text], select {
-      width: 100%; padding: 10px 0; border: none; border-bottom: 1px solid #dadce0;
-      font-size: 16px; outline: none; background: transparent;
-    }
-    input:focus, select:focus { border-bottom: 2px solid #1a73e8; }
+    /* Original Header Style */
+    .section-header { font-size: 1rem; font-weight: 500; color: #3c4043; display: flex; align-items: center; margin-bottom: 16px; }
+    .section-header i { margin-right: 16px; color: #5f6368; }
     
-    .btn-row { display: flex; gap: 8px; margin-top: 16px; }
-    .btn {
-      flex: 1; padding: 8px; text-align: center; border-radius: 4px; cursor: pointer;
-      font-weight: 500; font-size: 14px; border: 1px solid #dadce0; background: white; color: #1a73e8;
-    }
-    .btn:hover { background: #f8f9fa; }
-    .btn.disabled { color: #bdc1c6; pointer-events: none; }
-
-    /* LIST ITEMS */
-    .list-item { 
-      display: flex; align-items: center; padding: 12px 0; border-top: 1px solid #f1f3f4; cursor: pointer; 
-    }
-    .list-item:first-child { border-top: none; }
-    .list-item img { width: 40px; height: 40px; border-radius: 4px; margin-right: 16px; object-fit: cover; background: #eee; }
-    .list-item .text { display: flex; flex-direction: column; }
-    .list-item .title { font-weight: 500; font-size: 14px; color: #202124; }
-    .list-item .sub { font-size: 12px; color: #5f6368; }
-
-    /* STUDENT DETAILS */
-    .detail-photo { width: 100%; max-width: 250px; border-radius: 8px; margin: 16px auto; display: block; object-fit: cover; }
-    .detail-row { margin-bottom: 16px; }
-    .detail-label { font-size: 12px; color: #5f6368; display: block; margin-bottom: 4px; }
-    .detail-val { font-size: 14px; color: #202124; }
-    .link { color: #1a73e8; text-decoration: none; cursor: pointer; }
-
-    /* PHOTO GRID */
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .grid-item { text-align: center; cursor: pointer; }
-    .grid-item img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 4px; background: #eee; }
-    .grid-item div { font-size: 11px; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-    /* LOADER */
-    .loader { text-align: center; padding: 40px; color: #1a73e8; }
+    /* Universal Nav - Matched to Sidebar */
+    .nav-bar { display: flex; justify-content: space-around; padding: 12px 0; background-color: #fff; border-bottom: 1px solid #eee; }
+    .nav-bar a { color: #5f6368; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+    .nav-bar a:active { color: #1a73e8; }
+    
+    /* List Items */
+    .student-list-item { display: flex; align-items: center; padding: 12px 16px; cursor: pointer; border-top: 1px solid #e8eaed; }
+    .student-list-item img { width: 40px; height: 40px; border-radius: 4px; margin-right: 16px; object-fit: cover; }
+    .student-list-item .info { display: flex; flex-direction: column; }
+    .student-list-item .name { font-weight: 500; color: #202124; }
+    .student-list-item .email { font-size: 0.8rem; color: #5f6368; }
+    
+    /* Large Photo */
+    .student-photo { width: 100%; max-width: 250px; border-radius: 8px; margin: 16px auto; display: block; object-fit: cover; }
+    
+    /* Detail Rows */
+    .detail-item { margin-bottom: 16px; }
+    .detail-item .label { font-size: 0.75rem; color: #5f6368; display: block; margin-bottom: 4px; }
+    .detail-item .value { font-size: 1rem; color: #202124; }
+    
+    /* Buttons */
+    .btn-group { display: flex; gap: 10px; margin-top: 16px; }
+    .btn-small { flex: 1; background-color: #fff; color: #3c4043; border: 1px solid #dadce0; box-shadow: none; text-transform: none; }
+    
+    /* Grid */
+    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .photo-grid-item { text-align: center; cursor: pointer; }
+    .photo-grid-item img { width: 100%; aspect-ratio: 3/4; border-radius: 4px; object-fit: cover; }
+    .photo-grid-item .name { font-size: 0.75rem; margin-top: 4px; line-height: 1.2; }
+    
+    .link-text { color: #1a73e8; cursor: pointer; text-decoration: none; }
   </style>
 </head>
+
 <body>
+  <div id="app-container" class="container"></div>
 
-<div id="app"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
-<script>
-// --- CONFIGURATION ---
-const API = "https://script.google.com/macros/s/AKfycbyANBWAETI1cJq1lwnvzCAvjJRjGeanGvUzYNQH6Hvkw_T20473v9xD9blJVluFURlvIQ/exec";
+  <script>
+    // --- API URL (Paste your /exec URL here) ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbyMlIoIMhJVNgXzS1VvVlRMtlVEWOA9UNU8CEciZ7JWJNRan_yCG_7mIWiYu4wxxAfHBQ/exec";
 
-// --- STATE ---
-let state = {
-  hierarchy: {}, peClasses: [], 
-  recents: JSON.parse(localStorage.getItem('recents')||'[]'),
-  starred: JSON.parse(localStorage.getItem('starred')||'[]'),
-  currentList: [], currentIndex: -1, currentStudent: null
-};
+    // --- STATE ---
+    window.appState = { 
+        hierarchy: {}, peClasses: [], 
+        currentList: [], currentIndex: -1, currentStudent: null,
+        recents: JSON.parse(localStorage.getItem('recents')||'[]'),
+        starred: JSON.parse(localStorage.getItem('starred')||'[]')
+    };
 
-// --- INIT ---
-document.addEventListener('DOMContentLoaded', () => {
-  renderLoader();
-  fetchAPI('getHomepageData', {}, init);
-});
+    // --- BRIDGE ---
+    const google = { script: { run: {
+        withSuccessHandler(s) { this.s=s; return this; }, withFailureHandler(f) { this.f=f; return this; },
+        getHomepageData() { call('getHomepageData'); },
+        searchSheetLive(t) { call('search', {term:t}); },
+        getStudentDetailsForWebApp(r) { call('getStudentDetails', {row:r}); },
+        getStudentsForView(t,p) { call('getView', {viewType:t, ...p}); },
+        webSendFeedback(t) { call('feedback', {text:t}); }
+    }}};
+    
+    function call(a, p={}) {
+        const u = new URL(API_URL); u.searchParams.append('action', a);
+        for(let k in p) if(p[k]) u.searchParams.append(k, p[k]);
+        fetch(u).then(r=>r.json()).then(d=>{
+            if(d.error) alert(d.error); else window.google.script.run.s(d);
+        });
+    }
 
-function init(data) {
-  state.hierarchy = data.classHierarchy;
-  state.peClasses = data.peClasses;
-  renderHome();
-}
+    // --- INIT ---
+    document.addEventListener('DOMContentLoaded', () => {
+        showLoader();
+        google.script.run.withSuccessHandler(init).getHomepageData();
+    });
 
-// --- RENDERERS ---
+    function init(data) {
+        window.appState.hierarchy = data.classHierarchy;
+        window.appState.peClasses = data.peClasses;
+        renderHome();
+    }
 
-function renderHome() {
-  const years = Object.keys(state.hierarchy).map(y => `<option value="${y}">${y}</option>`).join('');
-  const pes = state.peClasses.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
-  
-  const recentsHtml = createList(state.recents, 'No recent searches.');
-  const starredHtml = createList(state.starred, 'No starred students.');
+    // --- VIEWS ---
 
-  document.getElementById('app').innerHTML = `
-    <div class="card">
-      ${createNavBar('home')}
-      
-      <div class="section">
-        <div class="section-header"><i class="material-icons">search</i>Student Search</div>
-        <input type="text" id="search" placeholder="Enter name, email, or ID..." onchange="handleSearch()">
-      </div>
-
-      <div class="section">
-        <div class="section-header"><i class="material-icons">photo_camera</i>Class Photo Viewer</div>
-        <select id="year" onchange="loadClasses(this.value)"><option value="" disabled selected>Year Group</option>${years}</select>
-        <select id="class" disabled><option>Class</option></select>
-        <select id="pe"><option value="" disabled selected>PE Class</option>${pes}</select>
+    function renderHome() {
+        const state = window.appState;
+        const app = document.getElementById('app-container');
         
-        <div class="btn-row">
-          <div class="btn" onclick="handleView('year')">Year</div>
-          <div class="btn" onclick="handleView('class')">Class</div>
-          <div class="btn" onclick="handleView('pe')">PE</div>
-        </div>
-      </div>
+        const recentsList = createList(state.recents, "No recent searches.");
+        const starredList = createList(state.starred, "No starred students.");
+        
+        const peOpts = createOptions(state.peClasses, "PE Class");
+        const yrOpts = createOptions(Object.keys(state.hierarchy).map(k=>({name:k})), "Year Group");
 
-      <div class="section">
-        <div class="section-header"><i class="material-icons">history</i>Recent Searches</div>
-        ${recentsHtml}
-      </div>
+        app.innerHTML = `
+            <div class="card-panel">
+                ${createNavBar('home')}
+                
+                <div class="section">
+                    <div class="section-header"><i class="material-icons">search</i>Student Search</div>
+                    <div class="input-field" style="margin-top:0">
+                        <input id="search" type="text" placeholder="Enter name, email, or ID" onchange="handleSearch()">
+                    </div>
+                </div>
 
-      <div class="section">
-        <div class="section-header"><i class="material-icons">star</i>Starred Students</div>
-        ${starredHtml}
-      </div>
+                <div class="section">
+                    <div class="section-header"><i class="material-icons">photo_camera</i>Class Photo Viewer</div>
+                    <div class="input-field"><select id="year" onchange="loadClasses()">${yrOpts}</select></div>
+                    <div class="input-field"><select id="class" disabled><option>Class</option></select></div>
+                    <div class="input-field"><select id="pe">${peOpts}</select></div>
+                    
+                    <div class="btn-group">
+                        <button class="btn-small waves-effect" onclick="handleView('year')">Year</button>
+                        <button class="btn-small waves-effect" onclick="handleView('class')">Class</button>
+                        <button class="btn-small waves-effect" onclick="handleView('pe')">PE</button>
+                    </div>
+                </div>
 
-      <div class="section" style="display:flex; justify-content:center; gap:20px;">
-         <span class="link" onclick="renderHelp()">Help</span>
-         <span class="link" onclick="renderFeedback()">Feedback</span>
-         <span class="link" onclick="renderAbout()">About</span>
-      </div>
-    </div>
-  `;
-}
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header"><i class="material-icons">history</i>Recent Searches</div>
+                        <div class="collapsible-body" style="padding:0">${recentsList}</div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header"><i class="material-icons">star</i>Starred Students</div>
+                        <div class="collapsible-body" style="padding:0">${starredList}</div>
+                    </li>
+                </ul>
 
-function renderSearchResults(list) {
-  state.currentList = list.map(s => s.row);
-  document.getElementById('app').innerHTML = `
-    <div class="card">
-      ${createNavBar()}
-      <div class="section">
-        <div class="section-header"><i class="material-icons">list</i>Search Results (${list.length})</div>
-        ${createList(list, 'No matches found.')}
-      </div>
-    </div>`;
-}
+                <div class="section center-align">
+                    <span class="link-text" onclick="renderHelp()" style="margin:0 10px">Help</span>
+                    <span class="link-text" onclick="renderFeedback()" style="margin:0 10px">Feedback</span>
+                </div>
+            </div>
+        `;
+        M.FormSelect.init(document.querySelectorAll('select'));
+        M.Collapsible.init(document.querySelectorAll('.collapsible'));
+    }
 
-function renderDetails(s) {
-  // Update state
-  state.currentStudent = s;
-  state.currentIndex = state.currentList.indexOf(parseInt(s.row));
-  addToRecents(s);
+    function renderDetails(s) {
+        window.appState.currentStudent = s;
+        window.appState.currentIndex = window.appState.currentList.indexOf(parseInt(s.row));
+        addToRecents(s);
 
-  // Star Icon logic
-  const isStarred = state.starred.some(st => st.row == s.row);
-  const starIcon = isStarred ? 'star' : 'star_border';
+        const isStarred = window.appState.starred.some(st => st.row == s.row);
+        const starIcon = isStarred ? "star" : "star_border";
 
-  document.getElementById('app').innerHTML = `
-    <div class="card">
-      ${createNavBar('details')}
-      <div style="padding:16px; text-align:center;">
-        <h2 style="margin:0; font-size:20px; font-weight:400;">${s.name}</h2>
-      </div>
-      <img src="${s.photoUrl}" class="detail-photo">
-      
-      <div class="section">
-        <div class="section-header">👤 Student Details</div>
-        ${item('Admission Number', s.admissionNumber)}
-        ${item('Date of Birth', s.dob)}
-        ${item('Current Age', s.currentAge)}
-        ${item('Sports Age', s.sportsAge)}
-        <div class="detail-row">
-           <span class="detail-label">Year / Form</span>
-           <span class="detail-val link" onclick="loadClassView('${s.yearGroup}', '${s.form}')">${s.yearGroup} / ${s.form}</span>
-        </div>
-      </div>
+        document.getElementById('app-container').innerHTML = `
+            <div class="card-panel">
+                ${createNavBar('details')}
+                
+                <h5 class="center-align" style="font-weight:400; margin:16px 0;">
+                    ${s.name}
+                    <i class="material-icons right" style="cursor:pointer; color:#f9ab00;" onclick="toggleStar()">${starIcon}</i>
+                </h5>
+                <img src="${s.photoUrl}" class="student-photo">
 
-      <div class="section">
-        <div class="section-header">📞 Contact Information</div>
-        ${emailItem('Student Email', s.email)}
-        ${item("Father's Mobile", s.fatherMobile)}
-        ${emailItem("Father's Email", s.fatherEmail)}
-        ${item("Mother's Mobile", s.motherMobile)}
-        ${emailItem("Mother's Email", s.motherEmail)}
-        <div class="detail-row">
-           <span class="detail-label">Parents Greeting</span>
-           <span class="detail-val">Coming soon</span>
-        </div>
-      </div>
+                <div class="section">
+                    <div class="section-header">👤 Student Details</div>
+                    ${item("Admission Number", s.admissionNumber)}
+                    ${item("Date of Birth", s.dob)}
+                    ${item("Current Age", s.currentAge)}
+                    ${item("Sports Age", s.sportsAge)}
+                    <div class="detail-item">
+                        <span class="label">Year / Form</span>
+                        <span class="value link-text" onclick="handleView('class', '${s.yearGroup}', '${s.form}')">${s.yearGroup} / ${s.form}</span>
+                    </div>
+                </div>
 
-      <div class="section">
-        <div class="section-header">⚕️ Medical Information</div>
-        ${item('Medical Comments', s.medicalComments)}
-        ${item('Ailment', s.ailment)}
-        ${item('Allergy', s.allergy)}
-      </div>
-    </div>`;
-}
+                <div class="section">
+                    <div class="section-header">📞 Contact Information</div>
+                    ${emailItem("Student Email", s.email)}
+                    ${item("Father's Mobile", s.fatherMobile)}
+                    ${emailItem("Father's Email", s.fatherEmail)}
+                    ${item("Mother's Mobile", s.motherMobile)}
+                    ${emailItem("Mother's Email", s.motherEmail)}
+                    ${item("Parents Greeting", "Coming soon")}
+                </div>
 
-function renderViewer(data) {
-  state.currentList = data.students.map(s => s.row);
-  const grid = data.students.map(s => `
-    <div class="grid-item" onclick="fetchStudent('${s.row}')">
-      <img src="${s.photoUrl}" loading="lazy">
-      <div>${s.name}</div>
-    </div>
-  `).join('');
+                <div class="section">
+                    <div class="section-header">⚕️ Medical Information</div>
+                    ${item("Medical Comments", s.medicalComments)}
+                    ${item("Ailment", s.ailment)}
+                    ${item("Allergy", s.allergy)}
+                </div>
+            </div>
+        `;
+    }
 
-  document.getElementById('app').innerHTML = `
-    <div class="card">
-      ${createNavBar()}
-      <div class="section">
-        <h3 style="font-size:16px; margin:0 0 10px 0;">${data.title} (${data.students.length})</h3>
-        <div class="grid">${grid}</div>
-      </div>
-    </div>`;
-}
+    function renderViewer(data) {
+        window.appState.currentList = data.students.map(s => s.row);
+        const grid = data.students.map(s => 
+            `<div class="photo-grid-item" onclick="fetchStudent('${s.row}')"><img src="${s.photoUrl}" loading="lazy"><div class="name">${s.name}</div></div>`
+        ).join('');
 
-function renderHelp() {
-  document.getElementById('app').innerHTML = `
-    <div class="card">
-      ${createNavBar()}
-      <div class="section">
-        <div class="section-header">Help & Instructions</div>
-        <p><b>Navigating:</b> Use the top bar to go Home, Search, or cycle (Back/Next) through students.</p>
-        <p><b>Searching:</b> Enter Name, ID, Parent Email or Phone.</p>
-        <p><b>Class Photo Viewer:</b> Select Year/Class/PE to view grid.</p>
-        <p><b>Starred:</b> Click the Star icon in the nav bar to view favorites.</p>
-        <div class="btn" onclick="renderHome()">Back Home</div>
-      </div>
-    </div>`;
-}
+        document.getElementById('app-container').innerHTML = `
+            <div class="card-panel">
+                ${createNavBar()}
+                <div class="section">
+                    <h6>${data.title} (${data.students.length})</h6>
+                    <div class="photo-grid">${grid}</div>
+                </div>
+            </div>
+        `;
+    }
 
-function renderFeedback() {
-  document.getElementById('app').innerHTML = `
-    <div class="card">
-      ${createNavBar()}
-      <div class="section">
-        <div class="section-header">Send Feedback</div>
-        <p>We appreciate your feedback! Describe your issue below.</p>
-        <textarea id="fb" style="width:100%; height:100px; border:1px solid #ddd;"></textarea>
-        <div class="btn" style="margin-top:10px;" onclick="submitFeedback()">Submit</div>
-      </div>
-    </div>`;
-}
+    // --- HELP & FEEDBACK ---
+    function renderHelp() {
+        document.getElementById('app-container').innerHTML = `
+            <div class="card-panel">
+                ${createNavBar()}
+                <div class="section">
+                    <div class="section-header">Help & Instructions</div>
+                    <p><b>Navigating:</b> Use the top bar icons to return Home, Search, or view Starred students. Use arrows to cycle through students.</p>
+                    <p><b>Searching:</b> Enter Name, ID, or Parent Email.</p>
+                    <p><b>Class Viewer:</b> Select Year/Class to see a photo grid.</p>
+                    <p><b>Starred:</b> Click the star icon to save for quick access.</p>
+                    <button class="btn-small white black-text" onclick="renderHome()">Back Home</button>
+                </div>
+            </div>`;
+    }
 
-// --- UI COMPONENTS ---
+    function renderFeedback() {
+        document.getElementById('app-container').innerHTML = `
+            <div class="card-panel">
+                ${createNavBar()}
+                <div class="section">
+                    <div class="section-header">Send Feedback</div>
+                    <p>We appreciate your feedback! Please describe your issue.</p>
+                    <textarea id="fb" class="materialize-textarea"></textarea>
+                    <button class="btn blue" onclick="submitFeedback()">Submit</button>
+                </div>
+            </div>`;
+    }
 
-function createNavBar(context) {
-  // Exact layout: Home | Search | Prev | Next | Star
-  const isDetail = context === 'details';
-  
-  // Dynamic Star Icon based on current student state if in details
-  let starAction = "viewStarred()";
-  let starIcon = "star";
-  
-  if (isDetail && state.currentStudent) {
-    const isStarred = state.starred.some(s => s.row == state.currentStudent.row);
-    starIcon = isStarred ? "star" : "star_border";
-    starAction = "toggleStar()";
-  }
+    // --- COMPONENTS ---
+    function createNavBar(ctx) {
+        const isDet = ctx === 'details';
+        return `
+            <div class="nav-bar section">
+                <a onclick="renderHome()"><i class="material-icons">home</i></a>
+                <a onclick="focusSearch()"><i class="material-icons">search</i></a>
+                <a onclick="nav(-1)" class="${!isDet?'grey-text':''}"><i class="material-icons">arrow_back</i></a>
+                <a onclick="nav(1)" class="${!isDet?'grey-text':''}"><i class="material-icons">arrow_forward</i></a>
+                <a onclick="renderStarred()"><i class="material-icons">star</i></a>
+            </div>
+        `;
+    }
 
-  return `
-    <div class="nav-bar">
-      <button class="nav-btn" onclick="renderHome()"><i class="material-icons">home</i></button>
-      <button class="nav-btn" onclick="focusSearch()"><i class="material-icons">search</i></button>
-      <button class="nav-btn ${!isDetail?'disabled':''}" onclick="nav(-1)"><i class="material-icons">arrow_back</i></button>
-      <button class="nav-btn ${!isDetail?'disabled':''}" onclick="nav(1)"><i class="material-icons">arrow_forward</i></button>
-      <button class="nav-btn" onclick="${starAction}"><i class="material-icons">${starIcon}</i></button>
-    </div>
-  `;
-}
+    function createList(list, msg) {
+        if(!list.length) return `<div style="padding:16px; color:#999;">${msg}</div>`;
+        return list.map(s => `
+            <div class="student-list-item" onclick="fetchStudent('${s.row}')">
+                <img src="${s.photoUrl}">
+                <div class="info"><span class="name">${s.name}</span><span class="email">${s.email||''}</span></div>
+            </div>
+        `).join('');
+    }
 
-function createList(list, emptyMsg) {
-  if (!list.length) return `<div style="padding:10px; color:#999; font-style:italic;">${emptyMsg}</div>`;
-  return list.map(s => `
-    <div class="list-item" onclick="fetchStudent('${s.row}')">
-      <img src="${s.photoUrl}">
-      <div class="text">
-        <span class="title">${s.name}</span>
-        <span class="sub">${s.email || ''}</span>
-      </div>
-    </div>
-  `).join('');
-}
+    function item(l, v) { return (!v || v==='N/A') ? '' : `<div class="detail-item"><span class="label">${l}</span><span class="value">${v}</span></div>`; }
+    function emailItem(l, v) { return (!v || v==='N/A') ? '' : `<div class="detail-item"><span class="label">${l}</span><a href="https://mail.google.com/mail/?view=cm&fs=1&to=${v}" class="link-text" target="_blank">${v}</a></div>`; }
+    
+    function createOptions(arr, ph) {
+        return `<option value="" disabled selected>${ph}</option>` + arr.map(i => `<option value="${i.name}">${i.name} ${i.count?`(${i.count})`:''}</option>`).join('');
+    }
 
-function item(lbl, val) {
-  if (!val || val === 'N/A') return '';
-  return `<div class="detail-row"><span class="detail-label">${lbl}</span><span class="detail-val">${val}</span></div>`;
-}
+    function showLoader() { document.getElementById('app-container').innerHTML = '<div style="padding:50px; text-align:center;"><div class="preloader-wrapper active"><div class="spinner-layer spinner-blue-only"><div class="circle-clipper left"><div class="circle"></div></div></div></div></div>'; }
 
-function emailItem(lbl, val) {
-  if (!val || val === 'N/A') return '';
-  return `<div class="detail-row"><span class="detail-label">${lbl}</span><a href="https://mail.google.com/mail/?view=cm&fs=1&to=${val}" target="_blank" class="link">${val}</a></div>`;
-}
+    // --- ACTIONS ---
+    function handleSearch() {
+        const val = document.getElementById('search').value;
+        if(val) { showLoader(); google.script.run.withSuccessHandler(renderSearchResults).searchSheetLive(val); }
+    }
+    function fetchStudent(row) {
+        showLoader(); google.script.run.withSuccessHandler(renderDetails).getStudentDetailsForWebApp(row);
+    }
+    function handleView(t, y, f) {
+        const params = { yearGroup: y || document.getElementById('year').value, form: f || document.getElementById('class').value, peClass: document.getElementById('pe').value };
+        if((t==='class' && (!params.yearGroup || !params.form)) || (t==='year' && !params.yearGroup) || (t==='pe' && !params.peClass)) return;
+        showLoader();
+        google.script.run.withSuccessHandler(d => renderViewer(d)).getStudentsForView(t, params);
+    }
+    function loadClasses() {
+        const y = document.getElementById('year').value;
+        const cls = window.appState.hierarchy[y].classes;
+        const sel = document.getElementById('class');
+        sel.innerHTML = createOptions(cls.map(c=>({name:c})), "Class");
+        sel.disabled = false;
+        M.FormSelect.init(sel);
+    }
+    function nav(d) {
+        const n = window.appState.currentIndex + d;
+        if(n >= 0 && n < window.appState.currentList.length) fetchStudent(window.appState.currentList[n]);
+    }
+    function toggleStar() {
+        const s = window.appState.currentStudent;
+        const i = window.appState.starred.findIndex(x => x.row == s.row);
+        if(i > -1) window.appState.starred.splice(i, 1);
+        else window.appState.starred.push({name:s.name, row:s.row, photoUrl:s.photoUrl, email:s.email});
+        localStorage.setItem('starred', JSON.stringify(window.appState.starred));
+        renderDetails(s);
+    }
+    function addToRecents(s) {
+        const r = window.appState.recents;
+        const i = r.findIndex(x => x.row == s.row);
+        if(i > -1) r.splice(i, 1);
+        r.unshift({name:s.name, row:s.row, photoUrl:s.photoUrl, email:s.email});
+        if(r.length > 5) r.pop();
+        localStorage.setItem('recents', JSON.stringify(r));
+    }
+    function submitFeedback() {
+        const t = document.getElementById('fb').value;
+        if(t) google.script.run.withSuccessHandler(()=>alert('Sent!')).webSendFeedback(t);
+    }
+    function focusSearch() { renderHome(); setTimeout(()=>document.getElementById('search').focus(), 100); }
+    function renderStarred() { 
+        document.getElementById('app-container').innerHTML = `<div class="card-panel">${createNavBar()}<div class="section"><div class="section-header">Starred</div>${createList(window.appState.starred, 'None')}</div></div>`;
+    }
 
-function renderLoader() {
-  document.getElementById('app').innerHTML = '<div class="loader"><i class="material-icons" style="font-size:48px; animation: spin 1s infinite linear;">autorenew</i></div>';
-}
-
-// --- LOGIC ---
-
-function fetchAPI(act, p, cb) {
-  const url = new URL(API);
-  url.searchParams.append('action', act);
-  for(let k in p) if(p[k]) url.searchParams.append(k, p[k]);
-  
-  fetch(url).then(r=>r.json()).then(d => {
-    if(d.error) alert("Error: " + d.error);
-    else cb(d);
-  }).catch(e => alert("Network Error: " + e));
-}
-
-function handleSearch() {
-  const term = document.getElementById('search').value;
-  if (!term) return;
-  renderLoader();
-  fetchAPI('search', {term}, renderSearchResults);
-}
-
-function fetchStudent(row) {
-  renderLoader();
-  fetchAPI('getStudentDetails', {row}, renderDetails);
-}
-
-function loadClasses(year) {
-  const forms = state.hierarchy[year].classes;
-  const sel = document.getElementById('class');
-  sel.innerHTML = '<option disabled selected>Class</option>' + forms.map(f => `<option value="${f}">${f}</option>`).join('');
-  sel.disabled = false;
-}
-
-function handleView(type) {
-  const yg = document.getElementById('year') ? document.getElementById('year').value : null;
-  const fm = document.getElementById('class') ? document.getElementById('class').value : null;
-  const pe = document.getElementById('pe') ? document.getElementById('pe').value : null;
-  
-  let p = { yearGroup: yg, form: fm, peClass: pe };
-  
-  if (type === 'year' && !yg) return;
-  if (type === 'class' && (!yg || !fm)) return;
-  if (type === 'pe' && !pe) return;
-
-  renderLoader();
-  fetchAPI('getView', {viewType: type, ...p}, renderViewer);
-}
-
-function loadClassView(y, f) {
-  renderLoader();
-  fetchAPI('getView', {viewType:'class', yearGroup:y, form:f}, renderViewer);
-}
-
-function nav(dir) {
-  const nextIdx = state.currentIndex + dir;
-  if (nextIdx >= 0 && nextIdx < state.currentList.length) {
-    fetchStudent(state.currentList[nextIdx]);
-  }
-}
-
-function toggleStar() {
-  const s = state.currentStudent;
-  const idx = state.starred.findIndex(x => x.row == s.row);
-  
-  if (idx > -1) state.starred.splice(idx, 1);
-  else state.starred.push({name: s.name, row: s.row, photoUrl: s.photoUrl, email: s.email});
-  
-  localStorage.setItem('starred', JSON.stringify(state.starred));
-  renderDetails(s); // Re-render to update star icon
-}
-
-function viewStarred() {
-  document.getElementById('app').innerHTML = `
-    <div class="card">
-      ${createNavBar()}
-      <div class="section">
-        <div class="section-header"><i class="material-icons">star</i>Starred Students</div>
-        ${createList(state.starred, 'No favorites yet.')}
-      </div>
-    </div>`;
-}
-
-function addToRecents(s) {
-  const idx = state.recents.findIndex(x => x.row == s.row);
-  if (idx > -1) state.recents.splice(idx, 1);
-  state.recents.unshift({name: s.name, row: s.row, photoUrl: s.photoUrl, email: s.email});
-  if (state.recents.length > 5) state.recents.pop();
-  localStorage.setItem('recents', JSON.stringify(state.recents));
-}
-
-function focusSearch() {
-  renderHome();
-  setTimeout(() => document.getElementById('search').focus(), 100);
-}
-
-function submitFeedback() {
-  const t = document.getElementById('fb').value;
-  if(t) fetchAPI('feedback', {text:t}, () => { alert("Feedback Sent!"); renderHome(); });
-}
-
-// Service Worker for Install
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-</script>
-
-<style>
-@keyframes spin { 100% { transform: rotate(360deg); } }
-</style>
+    if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+  </script>
 </body>
 </html>
